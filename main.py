@@ -15,6 +15,9 @@ class Main:
         self.window = pygame.display.set_mode([sizex, sizey])
         self.title = pygame.display.set_caption(title)
 
+        self.sizex = sizex
+        self.sizey = sizey
+
         self.menu = Menu("assets/tela inicio.png")
         self.game = Game()
         self.gameover = Gameover("assets/game_over.png")
@@ -27,13 +30,18 @@ class Main:
         if not self.menu.change_scene:
             self.menu.draw(self.window)
         elif not self.game.change_scene:
-            self.game.draw(self.window)
+            # movimento contínuo do aluno (player) com setas
+            teclas = pygame.key.get_pressed()
+            self.game.player.mover(teclas, self.sizex)
+
             self.game.update()
+            self.game.draw(self.window)
         elif self.game.scene_type == "gameover" and not self.gameover.change_scene:
             self.gameover.draw(self.window)
         elif self.game.scene_type == "win" and not self.winner.change_scene:
             self.winner.draw(self.window)
         else:
+            # reseta o jogo
             self.menu.change_scene = False
             self.game.change_scene = False
             self.gameover.change_scene = False
@@ -49,7 +57,8 @@ class Main:
             if not self.menu.change_scene:
                 self.menu.events(events)
             elif not self.game.change_scene:
-                self.game.player.move_player(events)
+                # não chama mais move_player por evento; movimento é contínuo em draw()
+                pass
             elif not self.winner.change_scene:
                 self.winner.events(events)
             else:
